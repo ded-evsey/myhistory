@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  tg-bot-myhistory:
+      env_file:
+        - .env
+      build: tg_bot/
+      restart: always
+      container_name: tg-bot-myhistory
+      ports:
+        - "5000:5000"
+      command: /srv/tg_bot/start.sh
+      volumes:
+        - ./tg_bot:/srv/tg_bot
+      depends_on:
+        - main-myhistory
+  main-myhistory:
+    image: django
+    ports:
+      - "8000:8000"
+    container_name: main-myhistory
+    depends_on:
+      - db-myhistory
+  db-myhistory:
+    image: postgres:12
+    restart: always
+    container_name: db-myhistory
+    environment:
+      - POSTGRES_USER=myhistory
+      - POSTGRES_PASSWORD=myhistory
+      - POSTGRES_DB=myhistory
+      - PGPASSWORD=myhistory
+      - POSTGRES_INITDB_ARGS="-E UTF8"
+    ports:
+        - 5432:5432
+    volumes:
+      - posgresql-myhistory:/var/lib/postgresql/data
+volumes:
+  posgresql-myhistory:
