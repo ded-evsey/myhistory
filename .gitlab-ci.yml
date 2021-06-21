@@ -1,0 +1,41 @@
+stages:
+    - build
+    - push
+    - deploy
+
+before_script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+
+
+.prod-stage: &prod-stage
+    environment:
+        name: prod
+
+build-api:prod:
+    <<: *prod-stage
+    stage: build
+    script: docker build -t registry.gitlab.com/ded-evsey/myhistory/api:prod api/.
+    only:
+      - prod
+
+build-tg_bot:prod:
+    <<: *prod-stage
+    stage: build
+    script: docker build -t registry.gitlab.com/ded-evsey/myhistory/tg_bot:prod tg_bot/.
+    only:
+      - prod
+
+
+push-api:prod:
+  <<: *prod-stage
+  stage: push
+  script: docker push registry.gitlab.com/ded-evsey/myhistory/api:prod
+  only:
+    - prod
+
+push-tg_bot:prod:
+  <<: *prod-stage
+  stage: push
+  script: docker push registry.gitlab.com/ded-evsey/myhistory/tg_bot:prod
+  only:
+    - prod
