@@ -1,0 +1,63 @@
+version: '3.9'
+
+services:
+  tgbotmyhistory:
+      env_file:
+        - .env
+      build: tg_bot/
+      restart: always
+      container_name: tgbotmyhistory
+      ports:
+        - "5000:5000"
+      command: /srv/tg_bot/start.sh
+      volumes:
+        - ./tg_bot:/srv/tg_bot
+      depends_on:
+        - apimyhistory
+
+
+  apimyhistory:
+      env_file:
+        - .env
+      build: api/
+      ports:
+        - "8000:8000"
+      container_name: apimyhistory
+      command: /srv/project/run.sh
+      restart: always
+      volumes:
+        - static-api:/srv/project/static
+        - media-api:/srv/project/media
+        - ./api:/srv/project
+      depends_on:
+        - dbmyhistory
+  dbmyhistory:
+      image: postgres:12
+      restart: always
+      container_name: dbmyhistory
+      environment:
+        - POSTGRES_USER=myhistory
+        - POSTGRES_PASSWORD=myhistory
+        - POSTGRES_DB=myhistory
+        - PGPASSWORD=myhistory
+        - POSTGRES_INITDB_ARGS="-E UTF8"
+      ports:
+        - 5432:5432
+      volumes:
+        - posgresql-myhistory:/var/lib/postgresql/data
+  nginxmyhistory:
+      build: nginx/
+      ports:
+        - 80:80
+        - 433:433
+      container_name: nginxmyhistory
+      depends_on:
+        - tgbotmyhistory
+        - apimyhistory
+      volumes:
+        - static-api:/srv/project/static:ro
+        - media-api:/srv/project/media:rw
+volumes:
+  posgresql-myhistory:
+  static-api:
+  media-api:

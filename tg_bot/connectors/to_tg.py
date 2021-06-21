@@ -1,8 +1,8 @@
 import requests
 from core import settings
+from .basic import BasicConnector
 
-
-class Messenger:
+class MessengerConnector(BasicConnector):
     url = 'https://api.telegram.org'
 
     def get_url(self,method, path=None):
@@ -13,11 +13,11 @@ class Messenger:
             method=method if method != 'file' else path
         )
 
-    def send_message(self,chat_id, msg):
+    def send_message(self, msg):
         method = 'sendMessage'
         url = self.get_url(method)
         data = {
-            "chat_id":chat_id,
+            "chat_id":self.chat_id,
             "text":msg
         }
         requests.post(url,data)
