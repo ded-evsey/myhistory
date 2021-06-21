@@ -3,6 +3,10 @@ from .models import Theme, TGUser
 # Register your models here.
 @admin.register(Theme)
 class ThemeAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'short'
+    ]
     actions = [
         'create_qr'
     ]
@@ -10,7 +14,7 @@ class ThemeAdmin(admin.ModelAdmin):
     def create_qr(self, request, queryset):
         pass
 
-
+@admin.register(TGUser)
 class TGUserAdmin(admin.ModelAdmin):
     list_display = [
         'user_ident',

@@ -25,7 +25,7 @@ def basic():
         connector = MainConnector(chat_id=message['chat']['id'])
         if message.get('text'):
             resp = connector.get_data(
-                message.get('text')
+                text_data=message.get('text')
             )
             tg_api.send_message(
                 resp if resp else get_response(
@@ -37,8 +37,8 @@ def basic():
             file_id = message.get('photo')[-1].get('file_id')
             with BytesIO() as file:
                 file_data = tg_api.get_file(file_id)
-                print(file_data)
-                resp = connector.get_data(file_data=file_data)
+                file.write(file_data)
+                resp = connector.get_data(file_data=file)
                 tg_api.send_message(
                     get_response(
                         message['from']['language_code'],

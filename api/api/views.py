@@ -1,19 +1,19 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from api.api.models import Theme,TGUser,Message
+from api.models import Theme,TGUser,Message
 # Create your views here.
 
 
 class ImgMessageSendAPI(APIView):
     def post(self, request, format=None):
         user,_ = TGUser.objects.get_or_create(
-            ident_user=request.POST.get('chat_id')
+            user_ident=request.POST.get('chat_id')
         )
         theme = Theme.objects.get_by_qr(request.FILES['file'][0])
         if not theme:
             Response(
                 {
-                    'chat_id':user.ident_user,
+                    'chat_id':user.user_ident,
                     'response':None
                 }
 
@@ -31,12 +31,12 @@ class ImgMessageSendAPI(APIView):
 class TextMessageSendAPI(APIView):
     def post(self,request, format=None):
         user, _ = TGUser.objects.get_or_create(
-            ident_user=request.POST.get('chat_id')
+            user_ident=request.POST['chat_id']
         )
         message = Message.objects.create(
             user=user,
             type=Message.TYPE_MESSAGE[0],
-            data=request.POST['text']
+            data=request.POST['text_message']
         )
         return Response(
             message.get_response()

@@ -1,11 +1,11 @@
 from django.db import models
 import uuid
 from pyzbar.pyzbar import decode
-from api.core import r_net
 # Create your models here.
 class ThemeManager(models.Manager):
     def get_by_qr(self, qr_img):
         try:
+            print(decode(qr_img))
             return self.objects.get(id=decode(qr_img)[0].data)
         except:
             return Theme.objects.none()
@@ -84,6 +84,8 @@ class Message(models.Model):
             if messages.count():
                 self.response = messages.last().response
             else:
+                from ..core.ml import model as r_net
+
                 answer = r_net([self.user.themes.last()],[self.data])
                 if answer:
                     self.response = answer
