@@ -1,10 +1,25 @@
 version: '3.9'
 
 services:
+  apimyhistory:
+    env_file:
+      - .env
+    image: dedevsey/myhistory-api:latest
+    ports:
+      - "8000:8000"
+    container_name: apimyhistory
+    command: /srv/project/run.sh
+    restart: always
+    volumes:
+      - static-api:/srv/project/static
+      - media-api:/srv/project/media
+      - ./api:/srv/project
+    depends_on:
+      - dbmyhistory
   tgbotmyhistory:
       env_file:
         - .env
-      build: tg_bot/
+      image: dedevsey/myhistory_tg_bot:latest
       restart: always
       container_name: tgbotmyhistory
       ports:
@@ -14,23 +29,6 @@ services:
         - ./tg_bot:/srv/tg_bot
       depends_on:
         - apimyhistory
-
-
-  apimyhistory:
-      env_file:
-        - .env
-      build: api/
-      ports:
-        - "8000:8000"
-      container_name: apimyhistory
-      command: /srv/project/run.sh
-      restart: always
-      volumes:
-        - static-api:/srv/project/static
-        - media-api:/srv/project/media
-        - ./api:/srv/project
-      depends_on:
-        - dbmyhistory
   dbmyhistory:
       image: postgres:12
       restart: always

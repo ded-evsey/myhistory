@@ -1,6 +1,9 @@
 from django.db import models
 import uuid
 from pyzbar.pyzbar import decode
+from django.contrib.postgres.search import SearchVector
+from deeppavlov import build_model, configs
+r_net = build_model(configs.squad.squad_ru, download=False)
 # Create your models here.
 class ThemeManager(models.Manager):
     def get_by_qr(self, qr_img):
@@ -74,18 +77,19 @@ class Message(models.Model):
     )
     def save(self, *args, **kwargs):
         self.response_theme = self.user.themes.last()
-        if int(self.type):
+        if self.type == self.TYPE_MESSAGE[1]:
             self.response = self.response_theme.short
         else:
             messages = Message.objects.filter(
                 type=self.type,
-                data__search=self.data
-            )
+            ).annotate(
+                search=SearchVector(
+                    'data'
+                )
+            ).filter(search=self.data)
             if messages.count():
                 self.response = messages.last().response
             else:
-                from ..core.ml import model as r_net
-
                 answer = r_net([self.user.themes.last()],[self.data])
                 if answer:
                     self.response = answer

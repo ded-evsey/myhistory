@@ -48,21 +48,22 @@ class MainConnector(BasicConnector):
     @property
     def method(self):
         if self.body_request_text:
-            return 'text-data'
+            return 'text-data/'
         if self.body_request_file:
-            return 'file-data'
+            return 'file-data/'
         return
 
     def get_data(self, text_data=None, file_data=None):
         if text_data:
             self.body_request_text = text_data
-        if file_data:
+        elif file_data:
             self.body_request_file = file_data
 
-        if not self.method or self.body:
+        if not self.method or not self.body:
             return
-        resp = requests.POST(
-            self.url + '/' + self.method,
-            **self.body
+        resp = requests.post(
+            settings.MAIN_CONTAINER_URL + '/' + self.method,
+            **self.body,
+            verify=False
         )
         return resp.json()

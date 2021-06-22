@@ -23,16 +23,6 @@ def basic():
             )
             return {"ok": True}
         connector = MainConnector(chat_id=message['chat']['id'])
-        if message.get('text'):
-            resp = connector.get_data(
-                text_data=message.get('text')
-            )
-            tg_api.send_message(
-                resp if resp else get_response(
-                    message['from']['language_code'],
-                    'not_found'
-                )
-            )
         if message.get('photo'):
             file_id = message.get('photo')[-1].get('file_id')
             with BytesIO() as file:
@@ -45,6 +35,18 @@ def basic():
                         'not_my_qr'
                     ) if not resp or not resp.get('response') else resp.get('response')
                 )
+            return {"ok": True }
+        if message.get('text'):
+            resp = connector.get_data(
+                text_data=message.get('text')
+            )
+            tg_api.send_message(
+                resp if resp else get_response(
+                    message['from']['language_code'],
+                    'not_found'
+                )
+            )
+            return {"ok": True }
     return {"ok": True}
 
 if __name__ == '__main__':

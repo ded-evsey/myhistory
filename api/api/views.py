@@ -16,7 +16,6 @@ class ImgMessageSendAPI(APIView):
                     'chat_id':user.user_ident,
                     'response':None
                 }
-
             )
         user.themes.add(theme)
         message = Message.objects.create(
@@ -31,12 +30,12 @@ class ImgMessageSendAPI(APIView):
 class TextMessageSendAPI(APIView):
     def post(self,request, format=None):
         user, _ = TGUser.objects.get_or_create(
-            user_ident=request.POST['chat_id']
+            user_ident=request.POST.get('chat_id')
         )
         message = Message.objects.create(
             user=user,
             type=Message.TYPE_MESSAGE[0],
-            data=request.POST['text_message']
+            data=request.POST.get('text_message')
         )
         return Response(
             message.get_response()
