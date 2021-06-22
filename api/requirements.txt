@@ -10,5 +10,5 @@ pyzbar==0.1.8
 sqlparse==0.4.1
 scipy==1.4.1
 deeppavlov==0.15.0
-tensorflow==2.5.0
+tensorflow==1.14.0
 djangorestframework==3.12.4
